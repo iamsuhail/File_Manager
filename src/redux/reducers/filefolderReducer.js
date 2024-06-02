@@ -8,6 +8,8 @@ import {
   SET_USER_FILES,
   SET_USER_FOLDERS,
   UPDATE_USER_FILE_DATA,
+  DELETE_FOLDER,
+  DELETE_FILE
 } from "../actions/filefoldersActions";
 
 const initialState = {
@@ -36,6 +38,11 @@ const filefolderReducer = (state = initialState, { type, payload }) => {
     case ADD_USER_FOLDER:
       state = { ...state, userFolders: [...state.userFolders, payload] };
       return state;
+    case DELETE_FOLDER:
+      state = {
+        ...state, userFolders: state.userFolders.filter((folder) => folder.docId !== payload)
+      };
+      return state;
     case RESET_FOLDERS_FILES:
       state = initialState;
       return state;
@@ -55,6 +62,11 @@ const filefolderReducer = (state = initialState, { type, payload }) => {
         userFiles: state.userFiles.map((file) =>
           file.docId === payload.docId ? currentUserFile : file
         ),
+      };
+      return state;
+    case DELETE_FILE:
+      state = {
+        ...state, userFiles: state.userFiles.filter((file) => file.docId !== payload)
       };
       return state;
     default:

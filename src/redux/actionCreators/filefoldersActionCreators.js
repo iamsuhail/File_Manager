@@ -2,6 +2,7 @@ import { toast } from "react-toastify";
 import { database } from "../../API/firebase";
 import docModel from "../../models/docs";
 import fileModel from "../../models/files";
+import axios from 'axios';
 import {
   SET_LOADING,
   SET_ADMIN_FILES,
@@ -11,6 +12,8 @@ import {
   SET_USER_FILES,
   ADD_USER_FILE,
   UPDATE_USER_FILE_DATA,
+  DELETE_FOLDER,
+  DELETE_FILE
 } from "../actions/filefoldersActions";
 
 const setLoading = (data) => ({
@@ -102,57 +105,123 @@ export const addFolderUser = (name, userId, parent, path) => (dispatch) => {
       toast.error("Something went wrong!");
     });
 };
-
+const deleteFolder = (docId) => ({
+  type: DELETE_FOLDER,
+  payload:docId
+})
+export const removeFolder = (docId) => (dispatch) => {
+  database.docs.where("parent", "==", docId).get().then((docs) => {
+    docs.forEach(async (doc) => {
+      await database.docs.doc(doc.id).delete();
+    });
+  }).then(() => {
+  database.files.where("parent", "==", docId).get().then((files) => {
+    files.docs.forEach(async (file) => {
+      await database.files.doc(file.id).delete();
+    });
+  })}).then(() => {
+  database.docs
+    .doc(docId)
+    .delete()
+    .then(async () => {
+      await dispatch(deleteFolder(docId));
+      toast.success("Folder Deleted Successfully!");
+    })
+    .catch((err) => {
+      console.log(err);
+      toast.error("Something went wrong!");
+    })})
+}
 const setUserFiles = (data) => ({
   type: SET_USER_FILES,
   payload: data,
 });
 
-export const getUserFiles = (userId) => (dispatch) => {
-  if (userId) {
-    database.files
-      .where("createdBy", "==", userId)
-      .get()
-      .then((files) => {
+export const getUserFiles = (userId) => async(dispatch) => {
+  try {
+    if (userId) {
+      await axios.get(`https://localhost:7043/api/Candidate/Get`) .then((response)=>{
         const allFiles = [];
-        files.docs.forEach((doc) => {
-          allFiles.push({ data: doc.data(), docId: doc.id });
+        console.log(response.data);
+        response.data.forEach((doc) => {
+          allFiles.push({ data: doc, docId: doc._id });
         });
         dispatch(setUserFiles(allFiles));
       })
-      .catch((err) => {
-        console.log("foldererr", err);
-        toast.error("Failed to fetch data!");
-      });
+    }}catch (error) {
+    console.error('Error fetching user files: ', error);
+    toast.error('Failed to fetch data!');
   }
 };
+
+// export const getUserFiles = (userId) => (dispatch) => {
+//   if (userId) {
+//     database.files
+//       .where("createdBy", "==", userId)
+//       .get()
+//       .then((files) => {
+//         const allFiles = [];
+//         files.docs.forEach((doc) => {
+//           allFiles.push({ data: doc.data(), docId: doc.id });
+//         });
+//         dispatch(setUserFiles(allFiles));
+//       })
+//       .catch((err) => {
+//         console.log("foldererr", err);
+//         toast.error("Failed to fetch data!");
+//       });
+//   }
+// };
 
 const addUserFile = (data) => ({
   type: ADD_USER_FILE,
   payload: data,
 });
 
-export const addFileUser =
-  ({ uid, parent, data, name, url, path }) =>
-  (dispatch) => {
-    database.files
-      .add(fileModel(uid, parent, data, name, url, path))
-      .then(async (doc) => {
-        const data = await doc.get();
-        dispatch(addUserFile({ data: data.data(), docId: data.id }));
-        if (data.data().url === "") {
-          toast.success("File created Successfully!");
-          toast.success("You can double click on the file to open the editor!");
-        } else {
-          toast.success("File uploaded Successfully!");
-        }
-      })
-      .catch((err) => {
-        console.log(err);
-        toast.error("Something went wrong!");
-      });
-  };
+// export const addFileUser =
+//   ({ uid, parent, data, name, url, path }) =>
+//   (dispatch) => {
+//     database.files
+//       .add(fileModel(uid, parent, data, name, url, path))
+//       .then(async (doc) => {
+//         const data = await doc.get();
+//         dispatch(addUserFile({ data: data.data(), docId: data.id }));
+//         if (data.data().url === "") {
+//           toast.success("File created Successfully!");
+//           toast.success("You can double click on the file to open the editor!");
+//         } else {
+//           toast.success("File uploaded Successfully!");
+//         }
+//       })
+//       .catch((err) => {
+//         console.log(err);
+//         toast.error("Something went wrong!");
+//       });
+//   };
+export const addFileUser = () => async (dispatch) => {
+  try {
+    const response = await axios.post('https://localhost:7120/api/DocumentsUpload/UploadFiles', {
+      // uid,
+      // parent,
+      // data,
+      // name,
+      // url,
+      // path,
+    });
 
+    dispatch(addUserFile({ data: response.data, docId: response.data.id }));
+
+    if (!response.data.url) {
+      toast.success('File created Successfully!');
+      toast.success('You can double click on the file to open the editor!');
+    } else {
+      toast.success('File uploaded Successfully!');
+    }
+  } catch (error) {
+    console.error('Error uploading file: ', error);
+    // toast.error('Failed to upload file!');
+  }
+};
 const updateUserFileData = (data) => ({
   type: UPDATE_USER_FILE_DATA,
   payload: data,
@@ -176,3 +245,20 @@ export const userFileDataUpdate = (data, docId) => (dispatch) => {
       toast.error("Something went wrong!");
     });
 };
+const deleteFile = (docId) => ({
+  type: DELETE_FILE,
+  payload:docId
+})
+export const removeFile = (docId) => (dispatch) => {
+  database.files
+    .doc(docId)
+    .delete()
+    .then(async () => {
+      await dispatch(deleteFile(docId));
+      toast.success("File Deleted Successfully!");
+    })
+    .catch((err) => {
+      console.log(err);
+      toast.error("Something went wrong!");
+    })
+}

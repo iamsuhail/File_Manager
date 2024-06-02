@@ -11,6 +11,7 @@
     "@testing-library/user-event": "^12.8.3",
     "@vitejs/plugin-react": "^4.2.1",
     "@vitejs/plugin-react-swc": "^3.6.0",
+    "axios": "^1.6.8",
     "bootstrap": "^5.0.1",
     "codemirror": "^5.61.1",
     "firebase": "^10.9.0",
@@ -29,7 +30,7 @@
     "web-vitals": "^1.1.1"
   },
   "scripts": {
-    "start": "vite",
+    "start": "vite --open",
     "build": "vite build",
     "preview": "vite preview"
   },
