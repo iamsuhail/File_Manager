@@ -21,6 +21,8 @@ import SubNav from '../SubNav.js/index.jsx';
 const Home = () => {
   const history = useHistory();
   const dispatch = useDispatch();
+  const [it, setIt] = React.useState([]);
+  const [it2, setIt2] = React.useState([]);
   const { isLoading, adminFolders, allUserFolders, userId, allUserFiles } =
     useSelector(
       (state) => ({
@@ -48,6 +50,18 @@ const Home = () => {
       (file) => file.data.parent === '' && file.data.url !== ''
     );
 
+    const adddocIds = (docId) => {
+      setIt([...it, docId]);
+    }
+    const deletedocIds = (docId) => {
+      setIt(it.filter(x=>x!==docId));
+    }
+    const addfileIds = (docId) => {
+      setIt2([...it2, docId]);
+    }
+    const deletefileIds = (docId) => {
+      setIt2(it2.filter(x=>x!==docId));
+    }
   useEffect(() => {
     if (isLoading && !adminFolders) {
       dispatch(getAdminFolders());
@@ -74,7 +88,7 @@ const Home = () => {
     <Row>
       {/* Sidebar */}
       <Col md={2}>
-        <SubNav currentFolder="root folder" />
+        <SubNav currentFolder="root folder" docIds={it} fileIds={it2}/>
       </Col>
       {/* {adminFolders && adminFolders.length > 0 && (
         <>
@@ -83,7 +97,7 @@ const Home = () => {
             {adminFolders.map(({ data, docId }) => (
               <Col
                 onDoubleClick={() =>
-                  history.push(`/dashboard/folder/admin/${docId}`)
+                  history.push(/dashboard/folder/admin/${docId})
                 }
                 onClick={(e) => {
                   if (e.currentTarget.classList.contains('text-white')) {
@@ -117,16 +131,18 @@ const Home = () => {
           <Row style={{ height: 'auto' }} className="pt-2 gap-2 pb-4 px-5">
             {userFolders.map(({ data, docId }) => (
               <Col
-                onDoubleClick={() => history.push(`/dashboard/folder/${docId}`)}
                 onClick={(e) => {
                   if (e.currentTarget.classList.contains('text-white')) {
+                    deletedocIds(docId);
                     e.currentTarget.style.background = '#fff';
                     e.currentTarget.classList.remove('text-white');
                   } else {
+                    if(e.detail === 1) adddocIds(docId);
                     e.currentTarget.style.background = 'black';
                     e.currentTarget.classList.add('text-white');
                   }
                 }}
+                onDoubleClick={() => history.push(`/dashboard/folder/${docId}`)}
                 key={docId}
                 md={2}
                 className="border h-50 d-flex align-items-center justify-content-around flex-column py-1 rounded-2">
@@ -144,27 +160,31 @@ const Home = () => {
       {createdUserFiles && createdUserFiles.length > 0 && (
         <>
           <p className="text-center border-bottom py-2">Created Files</p>
-          <Row style={{ height: 'auto' }} className="pt-2 gap-2 pb-4 px-5">
+          <Row md='2' style={{ height: 'auto' }} className="pt-2 gap-2 pb-4 px-5">
             {createdUserFiles.map(({ data, docId }) => (
               <Col
               onDoubleClick={() => history.push(`/dashboard/file/${docId}`)}
                 onClick={(e) => {
                   if (e.currentTarget.classList.contains('text-white')) {
+                    deletefileIds(docId);
                     e.currentTarget.style.background = '#fff';
                     e.currentTarget.classList.remove('text-white');
+                    e.currentTarget.classList.remove('shadow-sm');
                   } else {
+                    if(e.detail === 1) addfileIds(docId);
                     e.currentTarget.style.background = 'black';
                     e.currentTarget.classList.add('text-white');
+                    e.currentTarget.classList.add('shadow-sm');
 
                   }
                 }}
                 key={docId}
                 md={2}
-                className="border h-100 d-flex align-items-center justify-content-around flex-column py-1 rounded-2">
+                className="border h-100 mr-2 d-flex align-items-center justify-content-around flex-column py-1 rounded-2">
                 <FontAwesomeIcon
                   icon={faFileAlt}
                   className="mt-3"
-                  style={{ fontSize: '3rem', color: "#8f9094", }}
+                  style={{ fontSize: '3rem'}}
                   />
                 <p className="text-center mt-3">{data.name}</p>
               </Col>
@@ -184,9 +204,11 @@ const Home = () => {
                 onDoubleClick={() => history.push(`/dashboard/file/${docId}`)}
                 onClick={(e) => {
                   if (e.currentTarget.classList.contains('text-white')) {
+                    deletefileIds(docId);
                     e.currentTarget.style.background = '#fff';
                     e.currentTarget.classList.remove('text-white');
                   } else {
+                    if(e.detail === 1) addfileIds(docId);
                     e.currentTarget.style.background = 'black';
                     e.currentTarget.classList.add('text-white');
                     

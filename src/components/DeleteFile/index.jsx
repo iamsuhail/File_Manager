@@ -3,38 +3,39 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import React, { useState } from "react";
 import { Button, Form, Modal } from "react-bootstrap";
 import { shallowEqual, useDispatch, useSelector } from "react-redux";
-import { toast } from "react-toastify";
-import { addFolderUser } from "../../redux/actionCreators/filefoldersActionCreators";
+// import { toast } from "react-toastify";
+import { removeFile } from "../../redux/actionCreators/filefoldersActionCreators";
+
 import { faTrash } from "@fortawesome/free-solid-svg-icons";
-import {removeFolder} from "../../redux/actionCreators/filefoldersActionCreators";
-const DeleteFolder = ({ currentFolder, docIds }) => {
+
+const DeleteFile = ({ currentFolder,fileIds}) => {
   const dispatch = useDispatch();
 
 
 
-
-  const handleFolderDelete = (e) => {
+  const handleFileDelete = () => {
     // e.preventDefault();
-    docIds.map((docId) => {
-      dispatch(removeFolder(docId));
+    // console.log(docIds);
+    fileIds.map((fileId) => {
+      dispatch(removeFile(fileId));
     });
-    // toast.dark(" folder Deleted Successfully!");
+    // toast.dark(" Folder(s) Deleted Successfully!");
   };
   
   return (
     <>
   
       <Button
-        onClick={() => handleFolderDelete()}
+        onClick={() => handleFileDelete()}
         variant="outline-dark"
         className="border-1 d-flex align-items-center justify-content-between rounded-2 mt-3"
       >
         
         <FontAwesomeIcon icon={faTrash} />
-        &nbsp; Delete Folder
+        &nbsp; Delete File
       </Button>
     </>
   );
 };
 
-export default DeleteFolder;
+export default DeleteFile;

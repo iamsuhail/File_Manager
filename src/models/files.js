@@ -1,4 +1,4 @@
-const fileModel = (uid, parent, data, name, url, path) => {
+const fileModel = () => {
   const model = {
     createdAt: new Date(),
     createdBy: uid,
