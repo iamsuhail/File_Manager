@@ -2,23 +2,23 @@ import React from "react";
 import { Button, Nav, Navbar } from "react-bootstrap";
 import { shallowEqual, useDispatch, useSelector } from "react-redux";
 import { Link, useHistory } from "react-router-dom";
-import { logoutUser } from "../../../redux/actionCreators/authActionCreators";
+// import { logoutUser } from "../../../redux/actionCreators/authActionCreators";
 
 const NavDashboard = () => {
   const history = useHistory();
   const dispatch = useDispatch();
 
-  const { isLoggedIn, user } = useSelector(
-    (state) => ({
-      isLoggedIn: state.auth.isLoggedIn,
-      user: state.auth.user,
-    }),
-    shallowEqual
-  );
+  // const { isLoggedIn, user } = useSelector(
+  //   (state) => ({
+  //     isLoggedIn: state.auth.isLoggedIn,
+  //     user: state.auth.user,
+  //   }),
+  //   shallowEqual
+  // );
 
-  const logout = () => {
-    dispatch(logoutUser());
-  };
+  // const logout = () => {
+  //   dispatch(logoutUser());
+  // };
 
   return (
     <Navbar
@@ -35,7 +35,7 @@ const NavDashboard = () => {
         File Management System
       </Navbar.Brand>
       <Nav style={{ marginRight: "60px" }}>
-        {isLoggedIn ? (
+        {( // isLoggedIn ? 
           <>
             <Nav.Link
               className="d-flex align-items-center justify-content-between"
@@ -43,14 +43,14 @@ const NavDashboard = () => {
             >
               Welcome,
             </Nav.Link>
-            <Nav.Link
+            {/* <Nav.Link
               as={Link}
               style={{ marginRight: "10px", marginLeft: "-10px" }}
               className="text-dark"
               to="/dashboard/profile"
             >
               <strong>{user.data.displayName}</strong>
-            </Nav.Link>
+            </Nav.Link> */}
             <Nav.Link
               as={Button}
               variant="secondary"
@@ -62,7 +62,7 @@ const NavDashboard = () => {
             >
               Home
             </Nav.Link>
-            <Nav.Link
+            {/* <Nav.Link
               as={Button}
               variant="secondary"
               active
@@ -72,14 +72,14 @@ const NavDashboard = () => {
               className="text-white"
             >
               Logout
-            </Nav.Link>
+            </Nav.Link> */}
           </>
-        ) : (
-          <>
-            <Nav.Link active style={{ marginRight: "5px" }} size="sm">
-              Loading...
-            </Nav.Link>
-          </>
+        // ) : (
+        //   <>
+        //     <Nav.Link active style={{ marginRight: "5px" }} size="sm">
+        //       Loading...
+        //     </Nav.Link>
+        //   </>
         )}
       </Nav>
     </Navbar>

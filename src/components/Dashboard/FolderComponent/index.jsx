@@ -10,12 +10,12 @@ import React, { useEffect } from 'react';
 import { Col, Row } from 'react-bootstrap';
 import { shallowEqual, useDispatch, useSelector } from 'react-redux';
 import { useHistory, useParams } from 'react-router-dom';
-// import {
-//   getAdminFiles,
-//   getAdminFolders,
-//   getUserFiles,
-//   getUserFolders,
-// } from '../../../redux/actionCreators/filefoldersActionCreators.js';
+import {
+  getAdminFiles,
+  getAdminFolders,
+  getUserFiles,
+  getUserFolders,
+} from '../../../redux/actionCreators/filefoldersActionCreators.js';
 import SubNav from '../SubNav.js/index.jsx';
 
 
@@ -24,12 +24,12 @@ const FolderComponent = () => {
   const [it, setIt] = React.useState([]);
   const [it2, setIt2] = React.useState([]);
 
-  const { folders, isLoading, userId, files } = useSelector(
+  const { folders, isLoading, files } = useSelector(
     (state) => ({
       folders: state.filefolders.userFolders,
       files: state.filefolders.userFiles,
       isLoading: state.filefolders.isLoading,
-      userId: state.auth.userId,
+      // userId: state.auth.userId,
     }),
     shallowEqual
   );
@@ -59,16 +59,16 @@ const FolderComponent = () => {
       dispatch(getAdminFiles());
     }
     if (!folders && !files) {
-      dispatch(getUserFolders(userId));
-      dispatch(getUserFiles(userId));
+      dispatch(getUserFolders(folderId));
+      dispatch(getUserFiles(folderId));
     }
   }, [dispatch, folders, isLoading]);
 
   const userFolders =
-    folders && folders.filter((file) => file.data.parent === folderId);
+    folders //&& folders.filter((file) => file.data.parentFolderId === folderId);
 
   const currentFolder =
-    folders && folders.find((folder) => folder.docId === folderId);
+    folders && folders.find((folder) => folder.Id == folderId);
 
   const createdFiles =
     files &&
@@ -79,7 +79,7 @@ const FolderComponent = () => {
   const uploadedFiles =
     files &&
     files.filter(
-      (file) => file.data.parent === folderId && file.data.url !== ''
+      (file) => file.data.folderId == folderId 
     );
 
   if (isLoading) {
@@ -227,39 +227,39 @@ const FolderComponent = () => {
                 className="border h-100 mr-2 d-flex align-items-center justify-content-around flex-column py-1 rounded-2">
                 <FontAwesomeIcon
                   icon={
-                    data.name
+                    data.fileName
                       .split('.')
-                      [data.name.split('.').length - 1].includes('png') ||
-                    data.name
+                      [data.fileName.split('.').length - 1].includes('png') ||
+                    data.fileName
                       .split('.')
-                      [data.name.split('.').length - 1].includes('jpg') ||
-                    data.name
+                      [data.fileName.split('.').length - 1].includes('jpg') ||
+                    data.fileName
                       .split('.')
-                      [data.name.split('.').length - 1].includes('jpeg') ||
-                    data.name
+                      [data.fileName.split('.').length - 1].includes('jpeg') ||
+                    data.fileName
                       .split('.')
-                      [data.name.split('.').length - 1].includes('svg') ||
-                    data.name
+                      [data.fileName.split('.').length - 1].includes('svg') ||
+                    data.fileName
                       .split('.')
-                      [data.name.split('.').length - 1].includes('gif')
+                      [data.fileName.split('.').length - 1].includes('gif')
                       ? faFileImage
-                      : data.name
+                      : data.fileName
                           .split('.')
-                          [data.name.split('.').length - 1].includes('mp4') ||
-                        data.name
+                          [data.fileName.split('.').length - 1].includes('mp4') ||
+                        data.fileName
                           .split('.')
-                          [data.name.split('.').length - 1].includes('webm')
+                          [data.fileName.split('.').length - 1].includes('webm')
                       ? faFileVideo
-                      : data.name
+                      : data.fileName
                           .split('.')
-                          [data.name.split('.').length - 1].includes('mp3')
+                          [data.fileName.split('.').length - 1].includes('mp3')
                       ? faFileAudio
                       : faFileAlt
                   }
                   className="mt-3"
                   style={{ fontSize: '3rem', color: "#8f9094",}}
                 />
-                <p className="text-center mt-3">{data.name}</p>
+                <p className="text-center mt-3">{data.fileName}</p>
               </Col>
             ))}
           </Row>

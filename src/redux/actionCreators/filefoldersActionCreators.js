@@ -68,23 +68,37 @@ const setUserFolders = (data) => ({
   payload: data,
 });
 
-export const getUserFolders = (userId) => async (dispatch) => {
-  if (userId) {
-    database.docs
-      .where("createdBy", "==", userId)
-      .get()
-      .then((folders) => {
-        const allFolders = [];
-        folders.docs.forEach((doc) => {
-          allFolders.push({ data: doc.data(), docId: doc.id });
-        });
-        dispatch(setUserFolders(allFolders));
-      })
-      .catch((err) => {
-        console.log("foldererr", err);
-        toast.error("Failed to fetch data!");
+export const getUserFolders = (parentFolderId) => async (dispatch) => {
+  // database.docs
+  //   .where("createdBy", "==", userId)
+  //   .get()
+  //   .then((folders) => {
+  //     const allFolders = [];
+  //     folders.docs.forEach((doc) => {
+  //       allFolders.push({ data: doc.data(), docId: doc.id });
+  //     });
+  //     dispatch(setUserFolders(allFolders));
+  //   })
+  //   .catch((err) => {
+  //     console.log("foldererr", err);
+  //     toast.error("Failed to fetch data!");
+  //   });
+  try {
+    dispatch(setLoading(true));
+    await axios.get(`https://localhost:7120/api/Folder/GetAllChildFolders?parentFolderId=${parentFolderId}`) .then((response)=>{
+      const allFiles = [];
+      console.log(response.data);
+      response.data.forEach((doc) => {
+        allFiles.push({ data: doc, docId: doc.id });
       });
-  }
+      dispatch(setUserFolders(allFiles));
+      // dispatch(setLoading(false));
+    })
+  }catch (error) {
+  console.error('Error fetching user files: ', error);
+  console.log(error);
+  toast.error('Failed to fetch data!');
+}
 };
 
 const addUserFolder = (data) => ({
@@ -137,18 +151,19 @@ const setUserFiles = (data) => ({
   payload: data,
 });
 
-export const getUserFiles = (userId) => async(dispatch) => {
+export const getUserFiles = () => async(dispatch) => {
   try {
-    if (userId) {
-      await axios.get(`https://localhost:7043/api/Candidate/Get`) .then((response)=>{
+    // if (useId) {
+      await axios.get(`https://localhost:7120/api/DocumentsUpload/GetAllFiles
+      `) .then((response)=>{
         const allFiles = [];
         console.log(response.data);
         response.data.forEach((doc) => {
-          allFiles.push({ data: doc, docId: doc._id });
+          allFiles.push({ data: doc, docId: doc.id });
         });
         dispatch(setUserFiles(allFiles));
       })
-    }}catch (error) {
+    }catch (error) {
     console.error('Error fetching user files: ', error);
     toast.error('Failed to fetch data!');
   }
@@ -198,9 +213,9 @@ const addUserFile = (data) => ({
 //         toast.error("Something went wrong!");
 //       });
 //   };
-export const addFileUser = () => async (dispatch) => {
+export const addFileUser = (folderId) => async (dispatch) => {
   try {
-    const response = await axios.post('https://localhost:7120/api/DocumentsUpload/UploadFiles', {
+    const response = await axios.post(`https://localhost:7120/api/DocumentsUpload/UploadFile?folderId=${folderId}`, {
       // uid,
       // parent,
       // data,
@@ -211,12 +226,12 @@ export const addFileUser = () => async (dispatch) => {
 
     dispatch(addUserFile({ data: response.data, docId: response.data.id }));
 
-    if (!response.data.url) {
-      toast.success('File created Successfully!');
-      toast.success('You can double click on the file to open the editor!');
-    } else {
-      toast.success('File uploaded Successfully!');
-    }
+    // if (!response.data.url) {
+    //   toast.success('File created Successfully!');
+    //   toast.success('You can double click on the file to open the editor!');
+    // } else {
+    //   toast.success('File uploaded Successfully!');
+    // }
   } catch (error) {
     console.error('Error uploading file: ', error);
     // toast.error('Failed to upload file!');
