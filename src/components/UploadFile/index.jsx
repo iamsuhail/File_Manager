@@ -250,10 +250,10 @@ const UploadFile = ({ currentFolder }) => {
     try {
       const formData = new FormData();
       formData.append("file", file);
-      formData.append("userId", userId);
-      formData.append("parentFolderId", currentFolder.docId);
+      // formData.append("userId", userId);
+      formData.append("parentFolderId", currentFolder.Id);
 
-      const response = await axios.post("https://localhost:7120/api/DocumentsUpload/UploadFile", formData, {
+      const response = await axios.post(`https://localhost:7120/api/DocumentsUpload/UploadFile?folderId=${currentFolder.Id}`, formData, {
         onUploadProgress: (progressEvent) => {
           const newProgress = Math.round(
             (progressEvent.loaded / progressEvent.total) * 100
@@ -266,12 +266,12 @@ const UploadFile = ({ currentFolder }) => {
 
       dispatch(
         addFileUser({
-          uid: userId,
-          parent: currentFolder.docId,
+          // uid: userId,
+          parent: currentFolder.Id,
           data: "",
           name: file.name,
           url: url,
-          path: [{ id: currentFolder.docId,  }],
+          path: [{ id: currentFolder.Id,  }],
         })
       );
 

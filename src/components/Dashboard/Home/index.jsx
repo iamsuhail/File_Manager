@@ -23,21 +23,21 @@ const Home = () => {
   const dispatch = useDispatch();
   const [it, setIt] = React.useState([]);
   const [it2, setIt2] = React.useState([]);
-  const { isLoading, adminFolders, allUserFolders, userId, allUserFiles } =
+  const { isLoading, adminFolders, allUserFolders, allUserFiles } = // add userID
     useSelector(
       (state) => ({
         isLoading: state.filefolders.isLoading,
         adminFolders: state.filefolders.adminFolders,
         allUserFolders: state.filefolders.userFolders,
         allUserFiles: state.filefolders.userFiles,
-        userId: state.auth.userId,
+        // userId: state.auth.userId,
       }),
       shallowEqual
     );
 
   const userFolders =
-    allUserFolders &&
-    allUserFolders.filter((folder) => folder.data.parent === '');
+    allUserFolders 
+    // allUserFolders.filter((folder) => folder.data.parent === '');
 
   const createdUserFiles =
     allUserFiles &&
@@ -47,7 +47,7 @@ const Home = () => {
   const uploadedUserFiles =
     allUserFiles &&
     allUserFiles.filter(
-      (file) => file.data.parent === '' && file.data.url !== ''
+      (file) => file.data.folderId == 0 
     );
 
     const adddocIds = (docId) => {
@@ -68,8 +68,8 @@ const Home = () => {
       dispatch(getAdminFiles());
     }
     if (!userFolders) {
-      dispatch(getUserFiles(userId));
-      dispatch(getUserFolders(userId));
+      dispatch(getUserFiles());
+      dispatch(getUserFolders(0));
     }
   }, [dispatch, isLoading]);
 
@@ -194,68 +194,68 @@ const Home = () => {
       )}
       {uploadedUserFiles && uploadedUserFiles.length > 0 && (
         <>
-          <p className="text-center border-bottom py-2">Uploaded Files</p>
-          <Row
-            md="2"
-            style={{ height: 'auto' }}
-            className="pt-2  gap-2 pb-4 px-5">
-            {uploadedUserFiles.map(({ data, docId }) => (
-              <Col
-                onDoubleClick={() => history.push(`/dashboard/file/${docId}`)}
-                onClick={(e) => {
-                  if (e.currentTarget.classList.contains('text-white')) {
-                    deletefileIds(docId);
-                    e.currentTarget.style.background = '#fff';
-                    e.currentTarget.classList.remove('text-white');
-                  } else {
-                    if(e.detail === 1) addfileIds(docId);
-                    e.currentTarget.style.background = 'black';
-                    e.currentTarget.classList.add('text-white');
-                    
-                  }
-                }}
-                key={docId}
-                md={2}
-                className="border h-100 mr-2 d-flex align-items-center justify-content-around flex-column py-1 rounded-2">
-                <FontAwesomeIcon
-                  icon={
-                    data.name
+        <p className="text-center border-bottom py-2">Uploaded Files</p>
+        <Row
+          md="2"
+          style={{ height: 'auto' }}
+          className="pt-2  gap-2 pb-4 px-5">
+          {uploadedUserFiles.map(({ data, docId }) => (
+            <Col
+              onDoubleClick={() => history.push(`/dashboard/file/${docId}`)}
+              onClick={(e) => {
+                if (e.currentTarget.classList.contains('text-white')) {
+                  deletefileIds(docId);
+                  e.currentTarget.style.background = '#fff';
+                  e.currentTarget.classList.remove('text-white');
+                } else {
+                  if(e.detail === 1) addfileIds(docId);
+                  e.currentTarget.style.background = 'black';
+                  e.currentTarget.classList.add('text-white');
+                  
+                }
+              }}
+              key={docId}
+              md={2}
+              className="border h-100 mr-2 d-flex align-items-center justify-content-around flex-column py-1 rounded-2">
+              <FontAwesomeIcon
+                icon={
+                  data.fileName
+                  .split('.')
+                  [data.fileName.split('.').length - 1].includes('png') ||
+                  data.fileName
+                  .split('.')
+                  [data.fileName.split('.').length - 1].includes('jpg') ||
+                  data.fileName
                     .split('.')
-                    [data.name.split('.').length - 1].includes('png') ||
-                    data.name
+                    [data.fileName.split('.').length - 1].includes('jpeg') ||
+                    data.fileName
                     .split('.')
-                    [data.name.split('.').length - 1].includes('jpg') ||
-                    data.name
-                      .split('.')
-                      [data.name.split('.').length - 1].includes('jpeg') ||
-                      data.name
-                      .split('.')
-                      [data.name.split('.').length - 1].includes('svg') ||
-                      data.name
-                      .split('.')
-                      [data.name.split('.').length - 1].includes('gif')
-                      ? faFileImage
-                      : data.name
-                      .split('.')
-                      [data.name.split('.').length - 1].includes('mp4') ||
-                      data.name
-                          .split('.')
-                          [data.name.split('.').length - 1].includes('mpeg')
-                          ? faFileVideo
-                          : data.name
-                          .split('.')
-                          [data.name.split('.').length - 1].includes('mp3')
-                          ? faFileAudio
-                          : faFileAlt
-                        }
-                        className="mt-3"
-                        style={{ fontSize: '3rem', color: "#8f9094",}}
-                        />
-                <p className="text-center mt-3">{data.name}</p>
-              </Col>
-            ))}
-          </Row>
-        </>
+                    [data.fileName.split('.').length - 1].includes('svg') ||
+                    data.fileName
+                    .split('.')
+                    [data.fileName.split('.').length - 1].includes('gif')
+                    ? faFileImage
+                    : data.fileName
+                    .split('.')
+                    [data.fileName.split('.').length - 1].includes('mp4') ||
+                    data.fileName
+                        .split('.')
+                        [data.fileName.split('.').length - 1].includes('mpeg')
+                        ? faFileVideo
+                        : data.fileName
+                        .split('.')
+                        [data.fileName.split('.').length - 1].includes('mp3')
+                        ? faFileAudio
+                        : faFileAlt
+                      }
+                      className="mt-3"
+                      style={{ fontSize: '3rem', color: "#8f9094",}}
+                      />
+              <p className="text-center mt-3">{data.fileName}</p>
+            </Col>
+          ))}
+        </Row>
+      </>
       )}
       </Col>
     </Row>
